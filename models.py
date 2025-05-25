@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from sqlalchemy.orm import foreign, remote
 
 db = SQLAlchemy()
 
@@ -32,7 +33,11 @@ class Venue(db.Model):
     media = db.Column(db.String(200))
     
     # Relationship to bookings
-    bookings = db.relationship('Booking', backref='venue_service', lazy=True)
+    bookings = db.relationship('Booking',
+                             primaryjoin="and_(foreign(Venue.id)==remote(Booking.service_id), "
+                                       "Booking.service_type=='venue')",
+                             backref=db.backref('venue_service', uselist=False),
+                             lazy=True)
 
 class Hairdresser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,6 +49,13 @@ class Hairdresser(db.Model):
     location = db.Column(db.String(200))
     price = db.Column(db.Float)
     media = db.Column(db.String(200))
+    
+    # Relationship to bookings
+    bookings = db.relationship('Booking',
+                             primaryjoin="and_(foreign(Hairdresser.id)==remote(Booking.service_id), "
+                                       "Booking.service_type=='hairdresser')",
+                             backref=db.backref('hairdresser_service', uselist=False),
+                             lazy=True)
 
 class Weddingplanner(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -55,6 +67,13 @@ class Weddingplanner(db.Model):
     location = db.Column(db.String(200))
     price = db.Column(db.Float)
     media = db.Column(db.String(200))
+    
+    # Relationship to bookings
+    bookings = db.relationship('Booking',
+                             primaryjoin="and_(foreign(Weddingplanner.id)==remote(Booking.service_id), "
+                                       "Booking.service_type=='weddingplanner')",
+                             backref=db.backref('weddingplanner_service', uselist=False),
+                             lazy=True)
 
 class Makeupartist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -66,6 +85,13 @@ class Makeupartist(db.Model):
     location = db.Column(db.String(200))
     price = db.Column(db.Float)
     media = db.Column(db.String(200))
+    
+    # Relationship to bookings
+    bookings = db.relationship('Booking',
+                             primaryjoin="and_(foreign(Makeupartist.id)==remote(Booking.service_id), "
+                                       "Booking.service_type=='makeupartist')",
+                             backref=db.backref('makeupartist_service', uselist=False),
+                             lazy=True)
 
 class Venuedetails(db.Model):
     name = db.Column(db.String(180), primary_key=True, unique=True, nullable=False)
@@ -82,8 +108,9 @@ class Booking(db.Model):
     # Foreign key to User (customer who is booking)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
-    # Foreign key to Venue (venue being booked)
-    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
+    # Service type and ID
+    service_type = db.Column(db.String(20), nullable=False)  # 'venue', 'makeupartist', 'hairdresser', 'weddingplanner'
+    service_id = db.Column(db.Integer, nullable=False)
     
     # Booking details
     booking_date = db.Column(db.Date, nullable=False)  # Date of the actual service
@@ -93,4 +120,17 @@ class Booking(db.Model):
     status = db.Column(db.String(20), default='pending')  # 'pending', 'confirmed', 'cancelled', 'completed'
     
     def __repr__(self):
-        return f'<Booking {self.id}: User {self.user_id} -> Venue {self.venue_id} on {self.booking_date}>'
+        return f'<Booking {self.id}: User {self.user_id} -> {self.service_type} {self.service_id} on {self.booking_date}>'
+    
+    @property
+    def service(self):
+        """Get the service object based on service_type and service_id"""
+        if self.service_type == 'venue':
+            return self.venue_service
+        elif self.service_type == 'makeupartist':
+            return self.makeupartist_service
+        elif self.service_type == 'hairdresser':
+            return self.hairdresser_service
+        elif self.service_type == 'weddingplanner':
+            return self.weddingplanner_service
+        return None

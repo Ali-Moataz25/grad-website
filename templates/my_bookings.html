@@ -60,6 +60,14 @@
       color: #EFA6C0;
       font-weight: bold;
     }
+    .service-type-badge {
+      background-color: #EFA6C0;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 15px;
+      font-size: 0.8em;
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
@@ -71,7 +79,7 @@
       </a>
       <div class="navbar-nav ms-auto">
         <a class="nav-link" href="/">Home</a>
-        <a class="nav-link" href="/services/venue">Browse Venues</a>
+        <a class="nav-link" href="/services">Browse Services</a>
         <a class="nav-link active" href="/my_bookings">My Bookings</a>
       </div>
     </div>
@@ -85,9 +93,9 @@
       <div class="booking-card">
         <div class="row align-items-center">
           <div class="col-md-2">
-            {% if booking.venue_service.media %}
-              {% set image_filename = booking.venue_service.media.split('\\')[-1].split('/')[-1] %}
-              <img src="/static/images/{{ image_filename }}" alt="{{ booking.venue_service.username }}" class="booking-image">
+            {% if booking.service and booking.service.media %}
+              {% set image_filename = booking.service.media.split('\\')[-1].split('/')[-1] %}
+              <img src="/static/images/{{ image_filename }}" alt="{{ booking.service.username }}" class="booking-image">
             {% else %}
               <div class="booking-image bg-light d-flex align-items-center justify-content-center">
                 <span class="text-muted">No Image</span>
@@ -96,11 +104,16 @@
           </div>
           
           <div class="col-md-6">
-            <h5 class="mb-2">{{ booking.venue_service.username }}</h5>
+            <h5 class="mb-2">
+              {{ booking.service.username if booking.service else 'Service not found' }}
+              <span class="service-type-badge">{{ booking.service_type|title }}</span>
+            </h5>
             <p class="mb-1"><strong>Customer:</strong> {{ booking.customer.username }}</p>
             <p class="mb-1"><strong>Date:</strong> {{ booking.booking_date.strftime('%B %d, %Y') }}</p>
-            <p class="mb-1"><strong>Location:</strong> {{ booking.venue_service.location }}</p>
-            <p class="mb-1"><strong>Price:</strong> {{ booking.venue_service.price }} EGP</p>
+            {% if booking.service %}
+            <p class="mb-1"><strong>Location:</strong> {{ booking.service.location }}</p>
+            <p class="mb-1"><strong>Price:</strong> {{ booking.service.price }} EGP</p>
+            {% endif %}
             {% if booking.customer.phone_number %}
             <p class="mb-1"><strong>Phone:</strong> {{ booking.customer.phone_number }}</p>
             {% endif %}
@@ -131,8 +144,8 @@
       <div class="no-bookings">
         <h4>No Bookings Yet</h4>
         <p>You haven't made any bookings yet.</p>
-        <a href="/services/venue" class="btn btn-primary" style="background-color: #EFA6C0; border: none;">
-          Browse Venues
+        <a href="/services" class="btn btn-primary" style="background-color: #EFA6C0; border: none;">
+          Browse Services
         </a>
       </div>
     {% endif %}

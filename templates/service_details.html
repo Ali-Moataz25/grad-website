@@ -54,11 +54,7 @@
     {% endif %}
 
     <div class="booking-actions">
-      {% if service_type == 'venue' %}
-        <a href="/booking/{{ service.id }}" class="book-button">Book This Venue</a>
-      {% else %}
-        <a href="/booking" class="book-button">Book This {{ service_type|title }}</a>
-      {% endif %}
+      <a href="/booking/{{ service_type }}/{{ service.id }}" class="book-button">Book This {{ service_type|title }}</a>
       <a href="/services/{{ service_type }}" class="back-button">Back to {{ service_type|title }}s</a>
     </div>
   </main>

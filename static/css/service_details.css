@@ -89,11 +89,14 @@ body {
   box-shadow: 0 0 4px rgba(255, 77, 121, 0.5);
 }
 
-.book-button {
+.booking-actions {
+  margin-top: 30px;
+  display: flex;
+  gap: 20px;
+}
+
+.book-button, .back-button {
   display: inline-block;
-  margin-top: 20px;
-  background-color: #c94d73;
-  color: white;
   padding: 12px 24px;
   text-decoration: none;
   border-radius: 12px;
@@ -101,6 +104,20 @@ body {
   transition: background-color 0.3s;
 }
 
+.book-button {
+  background-color: #c94d73;
+  color: white;
+}
+
 .book-button:hover {
   background-color: #a8385c;
+}
+
+.back-button {
+  background-color: #EFA6C0;
+  color: white;
+}
+
+.back-button:hover {
+  background-color: #d88fa8;
 }

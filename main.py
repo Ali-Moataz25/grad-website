@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from models import db, User, Venue, Admin, Makeupartist, Weddingplanner, Hairdresser, Venuedetails, Booking
 from datetime import datetime, timedelta
+from sqlalchemy.orm import foreign, remote, joinedload
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
@@ -46,19 +47,28 @@ def home():
     return render_template("home_page.html") 
 
 @app.route("/booking")
-@app.route("/booking/<int:venue_id>")
-def booking(venue_id=None):
+@app.route("/booking/<service_type>/<int:service_id>")
+def booking(service_type=None, service_id=None):
     # Check if user is logged in
     if 'username' not in session:
         return redirect(url_for('login'))
     
-    if venue_id:
-        venue = Venue.query.get(venue_id)
-        if not venue:
-            return "Venue not found", 404
-        return render_template("booking.html", venue=venue, datetime=datetime, timedelta=timedelta)
-    else:
-        return render_template("booking.html")
+    # Get service details if service_id is provided
+    service = None
+    if service_id:
+        if service_type == 'venue':
+            service = Venue.query.get(service_id)
+        elif service_type == 'makeupartist':
+            service = Makeupartist.query.get(service_id)
+        elif service_type == 'hairdresser':
+            service = Hairdresser.query.get(service_id)
+        elif service_type == 'weddingplanner':
+            service = Weddingplanner.query.get(service_id)
+        
+        if not service:
+            return redirect(url_for('services'))
+    
+    return render_template("booking.html", service=service, service_type=service_type, datetime=datetime, timedelta=timedelta)
 
 @app.route("/login")
 def login():
@@ -303,33 +313,45 @@ def create_booking():
             return jsonify({"success": False, "message": "User not found"}), 404
         
         # Get form data
-        venue_id = int(request.form.get('venue_id'))
+        service_type = request.form.get('service_type')
+        service_id = int(request.form.get('service_id'))
         booking_date = request.form.get('date')
         
-        # Validate venue exists
-        venue = Venue.query.get(venue_id)
-        if not venue:
-            return jsonify({"success": False, "message": "Venue not found"}), 404
+        # Validate service exists based on type
+        service = None
+        if service_type == 'venue':
+            service = Venue.query.get(service_id)
+        elif service_type == 'makeupartist':
+            service = Makeupartist.query.get(service_id)
+        elif service_type == 'hairdresser':
+            service = Hairdresser.query.get(service_id)
+        elif service_type == 'weddingplanner':
+            service = Weddingplanner.query.get(service_id)
+        
+        if not service:
+            return jsonify({"success": False, "message": f"{service_type.title()} not found"}), 404
         
         # Convert string date to date object
         booking_date_obj = datetime.strptime(booking_date, '%Y-%m-%d').date()
         
-        # Check if venue is already booked on this date
+        # Check if service is already booked on this date
         existing_booking = Booking.query.filter_by(
-            venue_id=venue_id,
+            service_type=service_type,
+            service_id=service_id,
             booking_date=booking_date_obj
         ).filter(Booking.status != 'cancelled').first()
         
         if existing_booking:
             return jsonify({
                 "success": False, 
-                "message": "Sorry, this venue is already booked on the selected date"
+                "message": f"Sorry, this {service_type} is already booked on the selected date"
             }), 400
         
         # Create booking
         booking = Booking(
             user_id=user.id,
-            venue_id=venue_id,
+            service_type=service_type,
+            service_id=service_id,
             booking_date=booking_date_obj
         )
         
@@ -349,25 +371,36 @@ def create_booking():
             "message": f"Error creating booking: {str(e)}"
         }), 500
 
-@app.route('/check_venue_availability', methods=['POST'])
-def check_venue_availability():
-    """Check if a venue is available on a specific date"""
+@app.route('/check_service_availability', methods=['POST'])
+def check_service_availability():
+    """Check if a service is available on a specific date"""
     try:
         data = request.get_json()
-        venue_id = int(data.get('venue_id'))
+        service_type = data.get('service_type')
+        service_id = int(data.get('service_id'))
         booking_date = data.get('date')
         
-        # Validate venue exists
-        venue = Venue.query.get(venue_id)
-        if not venue:
-            return jsonify({"available": False, "error": "Venue not found"}), 404
+        # Validate service exists based on type
+        service = None
+        if service_type == 'venue':
+            service = Venue.query.get(service_id)
+        elif service_type == 'makeupartist':
+            service = Makeupartist.query.get(service_id)
+        elif service_type == 'hairdresser':
+            service = Hairdresser.query.get(service_id)
+        elif service_type == 'weddingplanner':
+            service = Weddingplanner.query.get(service_id)
+        
+        if not service:
+            return jsonify({"available": False, "error": f"{service_type.title()} not found"}), 404
         
         # Convert string date to date object
         booking_date_obj = datetime.strptime(booking_date, '%Y-%m-%d').date()
         
         # Check for existing bookings (excluding cancelled ones)
         existing_booking = Booking.query.filter_by(
-            venue_id=venue_id,
+            service_type=service_type,
+            service_id=service_id,
             booking_date=booking_date_obj
         ).filter(Booking.status != 'cancelled').first()
         
@@ -386,7 +419,14 @@ def my_bookings():
     if not user:
         return redirect(url_for('login'))
     
-    bookings = Booking.query.filter_by(user_id=user.id).order_by(Booking.created_at.desc()).all()
+    bookings = Booking.query.filter_by(user_id=user.id)\
+        .options(
+            joinedload(Booking.venue_service),
+            joinedload(Booking.makeupartist_service),
+            joinedload(Booking.hairdresser_service),
+            joinedload(Booking.weddingplanner_service)
+        )\
+        .order_by(Booking.created_at.desc()).all()
     return render_template('my_bookings.html', bookings=bookings)
 
 if __name__ == '__main__':

@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Book {{ venue.username }} - Wedding Services</title>
+  <title>Book {{ service.username }} - Wedding Services</title>
   <link rel="stylesheet" href="/static/css/booking.css" />
-
 </head>
 <body>
-
   <header class="navbar">
     <div class="navbar-left">
       <a href="/">Home</a>
@@ -21,28 +19,29 @@
   </header>
 
   <main class="content">
-    <h1>Book Your Venue</h1>
+    <h1>Book Your {{ service_type|title }}</h1>
     
-    <!-- Venue Information -->
-    <div class="venue-info">
+    <!-- Service Information -->
+    <div class="service-info">
       <div style="display: flex; align-items: center; gap: 20px;">
-        {% if venue.media %}
-          {% set image_filename = venue.media.split('\\')[-1].split('/')[-1] %}
-          <img src="/static/images/{{ image_filename }}" alt="{{ venue.username }}" 
+        {% if service.media %}
+          {% set image_filename = service.media.split('\\')[-1].split('/')[-1] %}
+          <img src="/static/images/{{ image_filename }}" alt="{{ service.username }}" 
                style="width: 150px; height: 100px; object-fit: cover; border-radius: 8px;">
         {% endif %}
         <div>
-          <h3>{{ venue.username }}</h3>
-          <p><strong>Location:</strong> {{ venue.location }}</p>
-          <p><strong>Price:</strong> {{ venue.price }} EGP</p>
-          <p><strong>Description:</strong> {{ venue.description }}</p>
+          <h3>{{ service.username }}</h3>
+          <p><strong>Location:</strong> {{ service.location }}</p>
+          <p><strong>Price:</strong> {{ service.price }} EGP</p>
+          <p><strong>Description:</strong> {{ service.description }}</p>
         </div>
       </div>
     </div>
 
     <!-- Booking Form -->
     <form class="booking-form" id="bookingForm">
-      <input type="hidden" name="venue_id" value="{{ venue.id }}" id="venueIdInput">
+      <input type="hidden" name="service_type" value="{{ service_type }}" id="serviceTypeInput">
+      <input type="hidden" name="service_id" value="{{ service.id }}" id="serviceIdInput">
       
       <label for="date">Select Date *</label>
       <input type="date" id="date" name="date" 
@@ -67,10 +66,12 @@
       const submitBtn = document.getElementById('submitBtn');
       const alertArea = document.getElementById('alertArea');
       const availabilityStatus = document.getElementById('availabilityStatus');
-      const venueIdInput = document.getElementById('venueIdInput');
+      const serviceTypeInput = document.getElementById('serviceTypeInput');
+      const serviceIdInput = document.getElementById('serviceIdInput');
       
-      // Get venue ID from hidden input
-      const venueId = parseInt(venueIdInput.value);
+      // Get service details from hidden inputs
+      const serviceType = serviceTypeInput.value;
+      const serviceId = parseInt(serviceIdInput.value);
       
       // Check availability when date changes
       dateInput.addEventListener('change', function() {
@@ -87,13 +88,14 @@
         submitBtn.disabled = true;
         
         try {
-          const response = await fetch('/check_venue_availability', {
+          const response = await fetch('/check_service_availability', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              venue_id: venueId,
+              service_type: serviceType,
+              service_id: serviceId,
               date: date
             })
           });
@@ -101,10 +103,10 @@
           const data = await response.json();
           
           if (data.available) {
-            availabilityStatus.innerHTML = '<div class="available">✓ This venue is available on the selected date</div>';
+            availabilityStatus.innerHTML = `<div class="available">✓ This ${serviceType} is available on the selected date</div>`;
             submitBtn.disabled = false;
           } else {
-            availabilityStatus.innerHTML = '<div class="unavailable">✗ This venue is already booked on the selected date</div>';
+            availabilityStatus.innerHTML = `<div class="unavailable">✗ This ${serviceType} is already booked on the selected date</div>`;
             submitBtn.disabled = true;
           }
         } catch (error) {
@@ -170,6 +172,5 @@
       }
     });
   </script>
-
 </body>
 </html>
