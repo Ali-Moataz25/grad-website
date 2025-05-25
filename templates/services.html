@@ -59,7 +59,7 @@
           <img src="/static/images/{{ image_filename }}" alt="{{ service.username }}" class="venue-image">
           <h3 class="venue-name">{{ service.username }}</h3>
           <p class="venue-description">{{ service.description or 'No description available' }}</p>
-          <a href="/{{ detail_route }}/{{ service.username }}" class="book-button">View Details</a>
+          <a href="/service_details/{{ service_type }}/{{ service.username }}" class="book-button">View Details</a>
         </div>
         {% endfor %}
       </div>

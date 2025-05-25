@@ -81,8 +81,7 @@ def services(service_type='venue'):
     return render_template("services.html", 
                          services=services_data, 
                          service_type=service_type,
-                         title=config['title'],
-                         detail_route=config['detail_route'])
+                         title=config['title'])
 
 # Legacy routes for backward compatibility
 @app.route("/venue")
@@ -135,41 +134,37 @@ def api_services(service_type):
     })
 
 # Detail routes
+@app.route('/service_details/<service_type>/<string:name>')
+def service_details(service_type, name):
+    if service_type not in SERVICE_CONFIG:
+        return "Service type not found", 404
+    
+    config = SERVICE_CONFIG[service_type]
+    service = config['model'].query.filter_by(username=name).first()
+    
+    if service:
+        return render_template('service_details.html', 
+                             service=service,
+                             service_type=service_type)
+    else:
+        return f"{service_type.title()} not found", 404
+
+# Legacy routes for backward compatibility
 @app.route('/venuedetails/<string:name>')
 def venue_details(name):
-    venue = Venue.query.filter_by(username=name).first()
-    if venue:
-        return render_template('venue_details.html', venue=venue)
-    else:
-        return "Venue not found", 404
+    return redirect(url_for('service_details', service_type='venue', name=name))
 
 @app.route('/hairdresserdetails/<string:name>')
 def hairdresser_details(name):
-    hairdresser = Hairdresser.query.filter_by(username=name).first()
-    if hairdresser:
-        return render_template('hairdresser_details.html', hairdresser=hairdresser)
-    else:
-        return "Hairdresser not found", 404
+    return redirect(url_for('service_details', service_type='hairdresser', name=name))
 
 @app.route('/makeupartistdetails/<string:name>')
 def makeupartist_details(name):
-    makeupartist = Makeupartist.query.filter_by(username=name).first()
-    if makeupartist:
-        return render_template('makeupartist_details.html', makeupartist=makeupartist)
-    else:
-        return "Makeup artist not found", 404
+    return redirect(url_for('service_details', service_type='makeupartist', name=name))
     
 @app.route('/weddingplannerdetails/<string:name>')
 def weddingplanner_details(name):
-    weddingplanner = Weddingplanner.query.filter_by(username=name).first()
-    if weddingplanner:
-        return render_template('weddingplanner_details.html', weddingplanner=weddingplanner)
-    else:
-        return "Wedding planner not found", 404
-
-
-
-
+    return redirect(url_for('service_details', service_type='weddingplanner', name=name))
 
 # Controller routes 
 @app.before_request
