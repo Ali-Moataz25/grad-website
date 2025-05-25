@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ weddingplanner.username }} - Details</title>
+  <link rel="stylesheet" href="/../static/css/venue_details.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="navbar-left">
+      <a href="/">Home</a>
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+    </div>
+    <div class="navbar-right">
+      <img src="../static/images/logo.png" class="logo-large" alt="Logo">
+    </div>
+  </header>
+
+  <main class="venue-details">
+    <h1>{{ weddingplanner.name }}</h1>
+    <h2> {{ weddingplanner.descrpition }}</h2>
+    <p><strong>Description:</strong> {{ weddingplanner.description }}</p>
+    <p><strong>Location:</strong> {{ weddingplanner.location }}</p>
+    <p><strong>Price:</strong> {{ weddingplanner.price }} EGP</p>
+
+    
+      <img src="{{ weddingplanner.media }}" alt="Venue Image" style="width: 300px; border-radius: 10px;">
+    
+
+  
+    <a href="/booking" class="book-button">Book This weddingplanner</a>
+  </main>
+
+</body>
+</html>

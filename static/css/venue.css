@@ -1,0 +1,196 @@
+/* Sidebar Styles */
+.sidebar {
+  width: 200px;
+  position: fixed;
+  float: left;
+  height: 100%;
+  background-color: #FADBEA;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  z-index: 100;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 10px 0;
+}
+
+.sidebar a {
+  text-decoration: none;
+  font-size: 16px;
+  color: #333;
+  display: block;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.sidebar a:hover {
+  background-color: #EFA6C0;
+}
+
+.sidebar .active {
+  background-color: #EFA6C0;
+  font-weight: bold;
+  color: white;
+}
+
+/* Content area */
+.content {
+  margin-left: 200px;
+  min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #FADBEA;
+  padding: 10px 20px;
+}
+
+.navbar-left a {
+  margin-right: 20px;
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+
+.navbar-left a:hover {
+  text-decoration: underline;
+}
+
+.logo-large {
+  height: 70px;
+}
+
+/* Main content */
+main {
+  padding: 40px 20px;
+}
+
+h1 {
+  color: #EFA6C0;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2.5em;
+}
+
+/* Service list header */
+.service-list-header {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.carousel-instruction {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 1.1em;
+}
+
+/* Book button - shared between carousel and grid */
+.book-button {
+  padding: 12px 24px;
+  font-size: 14px;
+  background-color: #FADBEA;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  text-decoration: none;
+  color: #333;
+  display: inline-block;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+
+.book-button:hover {
+  background-color: #EFA6C0;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Navigation Instructions */
+.carousel-controls {
+  text-align: center;
+  margin-top: 30px;
+  color: #666;
+}
+
+.carousel-controls p {
+  margin-bottom: 10px;
+}
+
+.keyboard-hint {
+  display: inline-block;
+  background: #EFA6C0;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  margin: 0 5px;
+}
+
+/* Legacy grid styles - keep for backward compatibility */
+.service-list {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.service-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 20%;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.service-card:hover {
+  transform: scale(1.03);
+}
+
+.service-card img {
+  width: 100%;
+  height: 135px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.service-card h3 {
+  color: #EFA6C0;
+  margin: 10px 0;
+}
+
+.service-card p {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.nav-style {
+  background-color: rgba(250, 219, 234, 0.75) !important; /* Same color but semi-transparent */
+  backdrop-filter: blur(10px); /* Frosted glass blur */
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Optional: soft border */
+  font-family: 'Courier New', Courier, monospace;
+}
+
+@media (max-width: 768px) {
+  .img-size {
+    width: 90vw;
+    height: auto;
+    max-height: 300px;
+  }
+}

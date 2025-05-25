@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book {{ venue.username }} - Wedding Services</title>
+  <link rel="stylesheet" href="/static/css/booking.css" />
+  <style>
+    .venue-info {
+      background: #FADBEA;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    .alert {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 5px;
+      display: none;
+    }
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .availability-status {
+      margin: 15px 0;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .available {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .unavailable {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .checking {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .booking-form {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="navbar-left">
+      <a href="/">Home</a>
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+    </div>
+    <div class="navbar-right">
+      <img src="/static/images/logo.png" alt="Logo" class="logo-large">
+    </div>
+  </header>
+
+  <main class="content">
+    <h1>Book Your Venue</h1>
+    
+    <!-- Venue Information -->
+    <div class="venue-info">
+      <div style="display: flex; align-items: center; gap: 20px;">
+        {% if venue.media %}
+          {% set image_filename = venue.media.split('\\')[-1].split('/')[-1] %}
+          <img src="/static/images/{{ image_filename }}" alt="{{ venue.username }}" 
+               style="width: 150px; height: 100px; object-fit: cover; border-radius: 8px;">
+        {% endif %}
+        <div>
+          <h3>{{ venue.username }}</h3>
+          <p><strong>Location:</strong> {{ venue.location }}</p>
+          <p><strong>Price:</strong> {{ venue.price }} EGP</p>
+          <p><strong>Description:</strong> {{ venue.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Form -->
+    <form class="booking-form" id="bookingForm">
+      <input type="hidden" name="venue_id" value="{{ venue.id }}" id="venueIdInput">
+      
+      <label for="date">Select Date *</label>
+      <input type="date" id="date" name="date" 
+             min="{{ (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d') }}" required>
+      
+      <div id="availabilityStatus" class="availability-status"></div>
+
+      <button type="submit" id="submitBtn" disabled>
+        <span class="btn-text">Confirm Booking</span>
+        <span class="spinner" style="display: none;">Processing...</span>
+      </button>
+    </form>
+
+    <!-- Alert area -->
+    <div id="alertArea" class="alert"></div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const bookingForm = document.getElementById('bookingForm');
+      const dateInput = document.getElementById('date');
+      const submitBtn = document.getElementById('submitBtn');
+      const alertArea = document.getElementById('alertArea');
+      const availabilityStatus = document.getElementById('availabilityStatus');
+      const venueIdInput = document.getElementById('venueIdInput');
+      
+      // Get venue ID from hidden input
+      const venueId = parseInt(venueIdInput.value);
+      
+      // Check availability when date changes
+      dateInput.addEventListener('change', function() {
+        if (this.value) {
+          checkAvailability(this.value);
+        } else {
+          availabilityStatus.innerHTML = '';
+          submitBtn.disabled = true;
+        }
+      });
+      
+      async function checkAvailability(date) {
+        availabilityStatus.innerHTML = '<div class="checking">Checking availability...</div>';
+        submitBtn.disabled = true;
+        
+        try {
+          const response = await fetch('/check_venue_availability', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              venue_id: venueId,
+              date: date
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (data.available) {
+            availabilityStatus.innerHTML = '<div class="available">✓ This venue is available on the selected date</div>';
+            submitBtn.disabled = false;
+          } else {
+            availabilityStatus.innerHTML = '<div class="unavailable">✗ This venue is already booked on the selected date</div>';
+            submitBtn.disabled = true;
+          }
+        } catch (error) {
+          console.error('Error checking availability:', error);
+          availabilityStatus.innerHTML = '<div class="unavailable">Error checking availability. Please try again.</div>';
+          submitBtn.disabled = true;
+        }
+      }
+      
+      bookingForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        const btnText = submitBtn.querySelector('.btn-text');
+        const spinner = submitBtn.querySelector('.spinner');
+        
+        btnText.style.display = 'none';
+        spinner.style.display = 'inline';
+        submitBtn.disabled = true;
+        bookingForm.classList.add('loading');
+        
+        try {
+          const formData = new FormData(bookingForm);
+          const response = await fetch('/create_booking', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            showAlert('success', data.message);
+            bookingForm.reset();
+            availabilityStatus.innerHTML = '';
+            // Redirect after 2 seconds
+            setTimeout(function() {
+              window.location.href = '/my_bookings';
+            }, 2000);
+          } else {
+            showAlert('danger', data.message);
+          }
+        } catch (error) {
+          showAlert('danger', 'An error occurred while creating the booking. Please try again.');
+          console.error('Error:', error);
+        } finally {
+          // Reset button state
+          btnText.style.display = 'inline';
+          spinner.style.display = 'none';
+          submitBtn.disabled = false;
+          bookingForm.classList.remove('loading');
+        }
+      });
+      
+      function showAlert(type, message) {
+        alertArea.className = 'alert alert-' + type;
+        alertArea.textContent = message;
+        alertArea.style.display = 'block';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(function() {
+          alertArea.style.display = 'none';
+        }, 5000);
+      }
+    });
+  </script>
+
+</body>
+</html>

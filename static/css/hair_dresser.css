@@ -1,0 +1,136 @@
+/* Sidebar Styles */
+.sidebar {
+  width: 200px;
+  position: fixed;
+  float: left;
+  height: 100%;
+  background-color: #FADBEA;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 10px 0;
+}
+
+.sidebar a {
+  text-decoration: none;
+  font-size: 16px;
+  color: #333;
+  display: block;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.sidebar a:hover {
+  background-color: #EFA6C0;
+}
+
+.sidebar .active {
+  background-color: #EFA6C0;
+  font-weight: bold;
+  color: white;
+}
+
+/* Navbar    */
+.navbar {
+  width:97%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #FADBEA;
+  padding: 10px 20px;
+}
+
+.navbar-left a {
+  margin-right: 20px;
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+
+.navbar-left a:hover {
+  text-decoration: underline;
+}
+
+.logo-large {
+  height: 70px;
+}
+
+h1 {
+  color: #EFA6C0;
+  text-align: center;
+}
+
+/* service list*/
+
+.service-list-header{
+  width: 88%;
+  float: right;
+  justify-content: center;
+}
+.service-list {
+  width: 88%;
+  float: right;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Service Card */
+
+.service-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 20%;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.service-card:hover {
+  transform: scale(1.03);
+}
+
+.service-card img {
+  width: 100%;
+  height: 135px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.service-card h3 {
+  color: #EFA6C0;
+  margin: 10px 0;
+}
+
+.service-card p {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.book-button {
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #FADBEA;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+}
+
+.book-button:hover {
+  background-color: #EFA6C0;
+}

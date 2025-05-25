@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login Page</title>
+  <link rel="stylesheet" href="../static/css/login.css">
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="logo"><img id="logo" src="../static/images/logo.png"></div>
+    <h2>Login</h2>
+    <form onsubmit="login_user(event)">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" required />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required />
+      </div>
+
+      <div class="form-group">
+        <label for="role">Login As:</label>
+        <select id="role" required>
+          <option value="">Select Role</option>
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
+          <option value="venue">Venue</option>
+          <option value="hair_dresser">Hair Dresser</option>
+          <option value="makeup_artist">Makeup Artist</option>
+          <option value="wedding_planner">Wedding Planner</option>
+        </select>
+      </div>
+
+      <button type="submit" class="login-button">Login</button>
+
+      <div class="register-link">
+        <p>Don't have an account? <a href="/register">Register</a></p>
+      </div>
+    </form>
+  </div>
+
+  <script src="../static/js/login.js"></script>
+</body>
+</html>
