@@ -19,6 +19,11 @@ function login_user(event){
     .then(response => response.json())
     .then(data => {
         if(data.result === "success") {
+            if (data.redirect) {
+                window.location.href = data.redirect;
+                return;
+            }
+            
             if (role === "user") {
                 window.location.href = "/"; 
             } else if (role === "venue") {
@@ -30,8 +35,8 @@ function login_user(event){
             } else if (role === "wedding_planner") {
                 window.location.href = "/services/weddingplanner";
             } else if (role === "admin") {
-                window.location.href = "/";
-            } else {
+                window.location.href = "/admin/dashboard";
+            }else {
                 window.location.href = "/";
             }
         } else {

@@ -4,6 +4,16 @@ from sqlalchemy.orm import foreign, remote
 
 db = SQLAlchemy()
 
+
+class Admin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120))
+    phone_number = db.Column(db.String(20))
+    
+
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -13,13 +23,6 @@ class User(db.Model):
     
     # Relationship to bookings
     bookings = db.relationship('Booking', backref='customer', lazy=True)
-
-class Admin(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
-    email = db.Column(db.String(120))
-    phone_number = db.Column(db.String(20))
 
 class Venue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -138,3 +141,19 @@ class Booking(db.Model):
         elif self.service_type == 'weddingplanner':
             return self.weddingplanner_service
         return None
+
+class ProviderUpdate(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    provider_type = db.Column(db.String(20), nullable=False)  # venue, hairdresser, etc.
+    provider_id = db.Column(db.Integer, nullable=False)
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Updated fields
+    email = db.Column(db.String(120))
+    phone_number = db.Column(db.String(20))
+    description = db.Column(db.Text)
+    location = db.Column(db.String(200))
+    price = db.Column(db.Float)
+    media = db.Column(db.String(200))
+    
+    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected

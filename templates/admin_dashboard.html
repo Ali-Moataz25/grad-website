@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Admin Dashboard</h2>
+    
+    <!-- Navigation Links -->
+    <div class="nav-links mb-4">
+        <a href="{{ url_for('admin_provider_updates') }}" class="btn btn-primary">View Provider Updates</a>
+    </div>
+    
+    <h3 class="mt-4">Pending Service Providers</h3>
+    
+    {% for service_type, providers in pending_providers.items() %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4>{{ service_type|title }}</h4>
+            </div>
+            <div class="card-body">
+                {% if providers %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for provider in providers %}
+                                    <tr>
+                                        <td>{{ provider.username }}</td>
+                                        <td>{{ provider.email }}</td>
+                                        <td>{{ provider.phone_number }}</td>
+                                        <td>{{ provider.description|truncate(100) }}</td>
+                                        <td>
+                                            <a href="{{ url_for('approve_provider', service_type=service_type, provider_id=provider.id) }}" 
+                                               class="btn btn-success btn-sm">Approve</a>
+                                            <a href="{{ url_for('reject_provider', service_type=service_type, provider_id=provider.id) }}" 
+                                               class="btn btn-danger btn-sm">Reject</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>No pending {{ service_type }} providers.</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %} 

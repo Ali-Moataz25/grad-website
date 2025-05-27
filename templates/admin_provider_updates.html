@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Pending Provider Updates</h2>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+    
+    {% if not updates %}
+    <div class="alert alert-info">
+        <h4 class="alert-heading">No pending updates</h4>
+        <p>There are no provider updates waiting for review.</p>
+    </div>
+    {% endif %}
+    
+    {% for update in updates %}
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">{{ update.provider_type|title }} Update Request</h4>
+            <small>Submitted: {{ update.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+        </div>
+        
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="fw-bold">Email:</label>
+                        <div>{{ update.email }}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="fw-bold">Phone Number:</label>
+                        <div>{{ update.phone_number }}</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="fw-bold">Description:</label>
+                        <div>{{ update.description }}</div>
+                    </div>
+                    
+                    {% if update.location %}
+                    <div class="mb-3">
+                        <label class="fw-bold">Location:</label>
+                        <div>{{ update.location }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label class="fw-bold">Price:</label>
+                        <div>{{ update.price }}</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    {% if update.media %}
+                    <div class="mb-3">
+                        <label class="fw-bold">New Image:</label>
+                        <img src="{{ url_for('static', filename='images/pending_' + update.media) }}" 
+                             alt="New provider image" class="img-fluid mt-2" style="max-width: 200px;">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <a href="{{ url_for('approve_provider_update', update_id=update.id) }}" 
+                   class="btn btn-success me-2"
+                   onclick="return confirm('Are you sure you want to approve these changes?')">
+                    Approve Changes
+                </a>
+                <a href="{{ url_for('reject_provider_update', update_id=update.id) }}" 
+                   class="btn btn-danger"
+                   onclick="return confirm('Are you sure you want to reject these changes?')">
+                    Reject Changes
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %} 
