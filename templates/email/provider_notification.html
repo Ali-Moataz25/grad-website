@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #EFA6C0;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .content {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .approved {
+            color: #28a745;
+        }
+        .rejected {
+            color: #dc3545;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #EFA6C0;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Registration Status Update</h1>
+    </div>
+    
+    <div class="content">
+        <p>Dear {{ provider.username }},</p>
+        
+        {% if status == 'approved' %}
+        <p>We are pleased to inform you that your registration as a {{ service_type }} has been <span class="approved">APPROVED</span>!</p>
+        
+        <p>Your service is now live on our platform and visible to potential customers. You can start receiving bookings immediately.</p>
+        
+        <p>To manage your service and view bookings, please click the button below:</p>
+        
+        <a href="http://localhost:5001/services" class="button">Go to Dashboard</a>
+        {% else %}
+        <p>We regret to inform you that your registration as a {{ service_type }} has been <span class="rejected">REJECTED</span>.</p>
+        
+        <p>This decision was made based on our current requirements and standards. You may submit a new registration with updated information if you wish to try again.</p>
+        
+        <p>If you have any questions or need clarification, please don't hesitate to contact us.</p>
+        {% endif %}
+        
+        <p>Best regards,<br>Wedding Services Team</p>
+    </div>
+</body>
+</html> 

@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, make_response
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
 from models import db, User, Venue, Admin, Makeupartist, Weddingplanner, Hairdresser, Venuedetails, Booking
 from datetime import datetime, timedelta
 from sqlalchemy.orm import foreign, remote, joinedload
@@ -10,9 +11,23 @@ CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 app.secret_key = "your_secret_key"
 
+# Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydb.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Email configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'ali2107767@miuegypt.edu.eg'
+app.config['MAIL_PASSWORD'] = 'etbc flpx vuem pwks'
+app.config['MAIL_DEFAULT_SENDER'] = ('Wedding Services', 'ali2107767@miuegypt.edu.eg')
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_DEBUG'] = True
+
+# Initialize extensions
 db.init_app(app)
+mail = Mail(app)
 
 with app.app_context():
     db.create_all()
@@ -86,14 +101,13 @@ def services(service_type='venue'):
         return "Service not found", 404
     
     config = SERVICE_CONFIG[service_type]
-    services_data = config['model'].query.all()
+    services_data = config['model'].query.filter_by(approval_status='approved').all()
     
     return render_template("services.html", 
                          services=services_data, 
                          service_type=service_type,
                          title=config['title'])
 
-# Legacy routes for backward compatibility
 @app.route("/venue")
 def venue():
     return redirect(url_for('services', service_type='venue'))
@@ -213,10 +227,81 @@ def login_user():
     else:
         return jsonify({"result": "Invalid username or password"}), 401
 
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('home'))
+
+def send_manager_notification_email(service_type, provider):
+    """Send notification email to manager about new service provider registration"""
+    try:
+        msg = Message(
+            f'New {service_type.title()} Registration Requires Approval',
+            recipients=['ali2107767@miuegypt.edu.eg']  # Manager's email
+        )
+        
+        msg.html = render_template(
+            'email/manager_notification.html',
+            service_type=service_type,
+            provider=provider
+        )
+        
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending manager notification: {str(e)}")
+        return False
+
+def send_provider_notification_email(provider, service_type, status):
+    """Send notification email to provider about their registration status"""
+    try:
+        msg = Message(
+            f'Your {service_type.title()} Registration Status',
+            recipients=[provider.email]
+        )
+        
+        msg.html = render_template(
+            'email/provider_notification.html',
+            provider=provider,
+            service_type=service_type,
+            status=status
+        )
+        
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending provider notification: {str(e)}")
+        return False
+
+def send_booking_confirmation_email(booking, user, service):
+    """Send a booking confirmation email to the user"""
+    try:
+        if not user.email:
+            print("User has no email address")
+            return False
+            
+        msg = Message(
+            'Your Wedding Service Booking Confirmation',
+            recipients=[user.email]
+        )
+        
+        msg.html = render_template(
+            'email/booking_confirmation.html',
+            booking=booking,
+            user=user,
+            service=service
+        )
+        
+        mail.send(msg)
+        print(f"Confirmation email sent to {user.email}")
+        return True
+    except Exception as e:
+        print(f"Error sending email: {str(e)}")
+        return False
+
 @app.route('/register_user', methods=['POST'])
 def register_user():
     select_value = request.form.get('select_value')
-
     username = request.form.get('username')
     password = request.form.get('password')
     phone_number = request.form.get('phone_number')
@@ -235,70 +320,155 @@ def register_user():
         media_file.save(save_path)
         media_path = f'{filename}'
 
-    # Use the right model based on role
-    if select_value == "user":
-        new_user = User(
-            username=username,
-            password=password,
-            email=email,
-            phone_number=phone_number
-        )
-    elif select_value == "admin":
-        new_user = Admin(
-            username=username,
-            password=password,
-            email=email,
-            phone_number=phone_number
-        )
-    elif select_value == "venue":
-        new_user = Venue(
-            username=username,
-            password=password,
-            phone_number=phone_number,
-            description=description,
-            location=location,
-            price=price,
-            media=media_path
-        )
-    elif select_value == "hair_dresser":
-        new_user = Hairdresser(
-            username=username,
-            password=password,
-            phone_number=phone_number,
-            description=description,
-            location=location,
-            price=price,
-            media=media_path
-        )
-    elif select_value == "makeup_artist":
-        new_user = Makeupartist(
-            username=username,
-            password=password,
-            phone_number=phone_number,
-            description=description,
-            location=location,
-            price=price,
-            media=media_path
-        )
-    elif select_value == "wedding_planner":
-        new_user = Weddingplanner(
-            username=username,
-            password=password,
-            phone_number=phone_number,
-            description=description,
-            price=price,
-            media=media_path
-        )
-    else:
-        return jsonify({"success": False, "message": "Invalid role"}), 400
+    try:
+        # Use the right model based on role
+        if select_value == "user":
+            new_user = User(
+                username=username,
+                password=password,
+                email=email,
+                phone_number=phone_number
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            return jsonify({"success": True, "message": "User registered successfully"})
+            
+        elif select_value == "admin":
+            new_user = Admin(
+                username=username,
+                password=password,
+                email=email,
+                phone_number=phone_number
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            return jsonify({"success": True, "message": "Admin registered successfully"})
+            
+        # Service provider registration
+        new_provider = None
+        if select_value == "venue":
+            new_provider = Venue(
+                username=username,
+                password=password,
+                phone_number=phone_number,
+                description=description,
+                location=location,
+                price=price,
+                media=media_path,
+                email=email
+            )
+        elif select_value == "hair_dresser":
+            new_provider = Hairdresser(
+                username=username,
+                password=password,
+                phone_number=phone_number,
+                description=description,
+                location=location,
+                price=price,
+                media=media_path,
+                email=email
+            )
+        elif select_value == "makeup_artist":
+            new_provider = Makeupartist(
+                username=username,
+                password=password,
+                phone_number=phone_number,
+                description=description,
+                location=location,
+                price=price,
+                media=media_path,
+                email=email
+            )
+        elif select_value == "wedding_planner":
+            new_provider = Weddingplanner(
+                username=username,
+                password=password,
+                phone_number=phone_number,
+                description=description,
+                price=price,
+                media=media_path,
+                email=email
+            )
+        
+        if new_provider:
+            db.session.add(new_provider)
+            db.session.commit()
+            
+            # Send notification to manager
+            send_manager_notification_email(select_value, new_provider)
+            
+            return jsonify({
+                "success": True, 
+                "message": "Registration submitted successfully. Please wait for admin approval."
+            })
+        
+        return jsonify({"success": False, "message": "Invalid role"})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": f"Error: {str(e)}"})
 
-    db.session.add(new_user)
-    db.session.commit()
+@app.route('/admin/approve_provider/<service_type>/<int:provider_id>')
+def approve_provider(service_type, provider_id):
+    if 'username' not in session or not Admin.query.filter_by(username=session['username']).first():
+        return "Unauthorized", 401
+    
+    try:
+        # Get the provider based on service type
+        provider = None
+        if service_type == 'venue':
+            provider = Venue.query.get(provider_id)
+        elif service_type == 'makeupartist':
+            provider = Makeupartist.query.get(provider_id)
+        elif service_type == 'hairdresser':
+            provider = Hairdresser.query.get(provider_id)
+        elif service_type == 'weddingplanner':
+            provider = Weddingplanner.query.get(provider_id)
+        
+        if not provider:
+            return "Provider not found", 404
+        
+        provider.approval_status = 'approved'
+        db.session.commit()
+        
+        # Send approval email to provider
+        send_provider_notification_email(provider, service_type, 'approved')
+        
+        return "Provider approved successfully"
+    except Exception as e:
+        db.session.rollback()
+        return f"Error: {str(e)}", 500
 
-    db.session.add(new_user)
-    db.session.commit()
-
-    return jsonify({"success": True, "message": "User registered successfully"})
+@app.route('/admin/reject_provider/<service_type>/<int:provider_id>')
+def reject_provider(service_type, provider_id):
+    if 'username' not in session or not Admin.query.filter_by(username=session['username']).first():
+        return "Unauthorized", 401
+    
+    try:
+        # Get the provider based on service type
+        provider = None
+        if service_type == 'venue':
+            provider = Venue.query.get(provider_id)
+        elif service_type == 'makeupartist':
+            provider = Makeupartist.query.get(provider_id)
+        elif service_type == 'hairdresser':
+            provider = Hairdresser.query.get(provider_id)
+        elif service_type == 'weddingplanner':
+            provider = Weddingplanner.query.get(provider_id)
+        
+        if not provider:
+            return "Provider not found", 404
+        
+        provider.approval_status = 'rejected'
+        db.session.commit()
+        
+        # Send rejection email to provider
+        send_provider_notification_email(provider, service_type, 'rejected')
+        
+        return "Provider rejected successfully"
+    except Exception as e:
+        db.session.rollback()
+        return f"Error: {str(e)}", 500
 
 @app.route('/create_booking', methods=['POST'])
 def create_booking():
@@ -358,9 +528,16 @@ def create_booking():
         db.session.add(booking)
         db.session.commit()
         
+        # Send confirmation email
+        email_sent = send_booking_confirmation_email(booking, user, service)
+        
+        response_message = f"Booking created successfully! Your booking ID is {booking.id}"
+        if not email_sent and user.email:
+            response_message += " (Note: There was an issue sending the confirmation email)"
+        
         return jsonify({
             "success": True, 
-            "message": f"Booking created successfully! Your booking ID is {booking.id}",
+            "message": response_message,
             "booking_id": booking.id
         })
         
@@ -428,6 +605,23 @@ def my_bookings():
         )\
         .order_by(Booking.created_at.desc()).all()
     return render_template('my_bookings.html', bookings=bookings)
+
+@app.route('/test_email')
+def test_email():
+    try:
+        msg = Message(
+            'Test Email from Wedding Services',
+            recipients=['ali2107767@miuegypt.edu.eg']
+        )
+        msg.body = 'This is a test email to verify the email configuration is working.'
+        mail.send(msg)
+        return "Test email sent successfully! Check your inbox."
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print("Error sending test email:")
+        print(error_details)
+        return f"Error sending test email: {str(e)}"
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

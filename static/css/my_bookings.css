@@ -1,0 +1,62 @@
+
+    .bookings-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    .booking-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      padding: 25px;
+      transition: transform 0.3s;
+    }
+    .booking-card:hover {
+      transform: translateY(-2px);
+    }
+    .status-badge {
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: bold;
+    }
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    .status-confirmed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .status-cancelled {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .status-completed {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+    .booking-image {
+      width: 120px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .no-bookings {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+    .booking-id {
+      color: #EFA6C0;
+      font-weight: bold;
+    }
+    .service-type-badge {
+      background-color: #EFA6C0;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 15px;
+      font-size: 0.8em;
+      margin-left: 10px;
+    }

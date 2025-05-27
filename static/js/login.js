@@ -20,7 +20,7 @@ function login_user(event){
     .then(data => {
         if(data.result === "success") {
             if (role === "user") {
-                window.location.href = "/services/venue"; // Send users to browse venues
+                window.location.href = "/"; 
             } else if (role === "venue") {
                 window.location.href = "/services/venue";
             } else if (role === "hair_dresser") {

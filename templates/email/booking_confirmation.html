@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #EFA6C0;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .content {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .booking-details {
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #EFA6C0;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Booking Confirmation</h1>
+    </div>
+    
+    <div class="content">
+        <p>Dear {{ user.username }},</p>
+        
+        <p>Thank you for booking with Wedding Services! Your booking has been confirmed.</p>
+        
+        <div class="booking-details">
+            <h2>Booking Details:</h2>
+            <p><strong>Booking ID:</strong> #{{ booking.id }}</p>
+            <p><strong>Service Type:</strong> {{ booking.service_type|title }}</p>
+            <p><strong>Service Provider:</strong> {{ service.username }}</p>
+            <p><strong>Date:</strong> {{ booking.booking_date.strftime('%B %d, %Y') }}</p>
+            <p><strong>Location:</strong> {{ service.location }}</p>
+            <p><strong>Price:</strong> {{ service.price }} EGP</p>
+        </div>
+        
+        <p>You can view your booking details and status anytime by clicking the button below:</p>
+        
+        <a href="http://localhost:5001/my_bookings" class="button">View My Bookings</a>
+        
+        <p>If you have any questions or need to make changes to your booking, please don't hesitate to contact us.</p>
+    </div>
+    
+    <div class="footer">
+        <p>This is an automated email, please do not reply directly to this message.</p>
+        <p>Wedding Services | Email: venuefinder@gmail.com | Phone: +20111 334 2626</p>
+    </div>
+</body>
+</html> 

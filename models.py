@@ -31,6 +31,7 @@ class Venue(db.Model):
     location = db.Column(db.String(200))
     price = db.Column(db.Float)
     media = db.Column(db.String(200))
+    approval_status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
     
     # Relationship to bookings
     bookings = db.relationship('Booking',
@@ -49,6 +50,7 @@ class Hairdresser(db.Model):
     location = db.Column(db.String(200))
     price = db.Column(db.Float)
     media = db.Column(db.String(200))
+    approval_status = db.Column(db.String(20), default='pending')
     
     # Relationship to bookings
     bookings = db.relationship('Booking',
@@ -67,6 +69,7 @@ class Weddingplanner(db.Model):
     location = db.Column(db.String(200))
     price = db.Column(db.Float)
     media = db.Column(db.String(200))
+    approval_status = db.Column(db.String(20), default='pending')
     
     # Relationship to bookings
     bookings = db.relationship('Booking',
@@ -85,6 +88,7 @@ class Makeupartist(db.Model):
     location = db.Column(db.String(200))
     price = db.Column(db.Float)
     media = db.Column(db.String(200))
+    approval_status = db.Column(db.String(20), default='pending')
     
     # Relationship to bookings
     bookings = db.relationship('Booking',
