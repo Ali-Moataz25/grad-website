@@ -37,9 +37,7 @@
           </li>
           {% endif %}
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Services
-            </a>
+            
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="/services/venue">Venue</a></li>
               <li><a class="dropdown-item" href="/services/hairdresser">Hairdresser</a></li>
@@ -48,6 +46,25 @@
             </ul>
           </li>
         </ul>
+
+        <!-- Search and Filter Bar -->
+        <form class="d-flex me-3" id="searchFilterForm">
+          <div class="input-group">
+            <select class="form-select" id="serviceTypeInput" style="max-width: 180px;">
+              <option value="">Select Service Type</option>
+              <option value="venue">Venues</option>
+              <option value="hairdresser">Hair Dressers</option>
+              <option value="weddingplanner">Wedding Planners</option>
+              <option value="makeupartist">Makeup Artists</option>
+            </select>
+            <select class="form-select" id="locationFilter" style="max-width: 150px;" disabled>
+              <option value="">Select Service First</option>
+            </select>
+            <input type="number" class="form-control" placeholder="Max Price" id="priceFilter" style="max-width: 120px;">
+            <input type="date" class="form-control" id="dateFilter" style="max-width: 150px;">
+            <button class="btn btn-outline-primary" type="submit">Search</button>
+          </div>
+        </form>
       </div>
     </div>
   </nav>
@@ -196,7 +213,11 @@
     </div>
   </main>
 
+  <!-- Hidden input to store locations data -->
+  <input type="hidden" id="locationsData" value='{{ locations_by_service|tojson|safe }}'>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/search.js"></script>
 </body>
 </html>
 

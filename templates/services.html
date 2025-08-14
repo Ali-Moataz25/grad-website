@@ -50,6 +50,31 @@
             </ul>
           </li>
         </ul>
+
+        <!-- Filter Section in Nav -->
+        <form class="d-flex align-items-center gap-2" method="get">
+          <select class="form-select form-select-sm" name="provider" onchange="this.form.submit()" style="max-width: 150px;">
+            <option value="">All Providers</option>
+            {% for name in provider_names %}
+            <option value="{{ name }}" {% if selected_provider == name %}selected{% endif %}>
+              {{ name }}
+            </option>
+            {% endfor %}
+          </select>
+          
+          <select class="form-select form-select-sm" name="location" onchange="this.form.submit()" style="max-width: 150px;">
+            <option value="">All Locations</option>
+            {% for location in locations %}
+            <option value="{{ location }}" {% if selected_location == location %}selected{% endif %}>
+              {{ location }}
+            </option>
+            {% endfor %}
+          </select>
+          
+          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearFilters()">
+            Clear
+          </button>
+        </form>
       </div>
     </div>
   </nav>
@@ -82,6 +107,11 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/static/js/carousel.js"></script>
+  <script>
+  function clearFilters() {
+      window.location.href = '/services/{{ service_type }}';
+  }
+  </script>
 </body>
 </html>
 

@@ -297,12 +297,8 @@ body {
 }
 
 .nav-style {
-  background-color: rgba(250, 219, 234, 0.75) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 0.5rem 1rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand img {
@@ -323,5 +319,57 @@ body {
     width: 90vw;
     height: auto;
     max-height: 300px;
+  }
+}
+
+/* Search and Filter Bar Styles */
+#searchFilterForm {
+  margin-left: auto;
+}
+
+#searchFilterForm .input-group {
+  max-width: 800px;
+}
+
+#searchFilterForm input,
+#searchFilterForm select {
+  border-radius: 4px;
+  margin-right: 4px;
+  border: 1px solid #ced4da;
+}
+
+#searchFilterForm input:focus,
+#searchFilterForm select:focus {
+  border-color: #EFA6C0;
+  box-shadow: 0 0 0 0.2rem rgba(239, 166, 192, 0.25);
+}
+
+#searchFilterForm button {
+  background-color: #EFA6C0;
+  border-color: #EFA6C0;
+  color: white;
+}
+
+#searchFilterForm button:hover {
+  background-color: #e791ae;
+  border-color: #e791ae;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  #searchFilterForm {
+    margin: 1rem 0;
+  }
+  
+  #searchFilterForm .input-group {
+    flex-wrap: wrap;
+  }
+  
+  #searchFilterForm input,
+  #searchFilterForm select,
+  #searchFilterForm button {
+    margin: 0.25rem 0;
+    width: 100%;
+    max-width: 100%;
   }
 }

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h2 {
+            color: #EFA6C0;
+        }
+        .content {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #EFA6C0;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>How Was Your Wedding Service?</h2>
+        </div>
+        
+        <div class="content">
+            <p>Dear {{ user.username }},</p>
+            
+            <p>Thank you for using our wedding services! We hope you had a wonderful experience with {{ service.username }}.</p>
+            
+            <p>Would you mind taking a moment to share your experience? Your feedback helps other couples make informed decisions and helps our providers improve their services.</p>
+            
+            <p>Service Details:</p>
+            <ul>
+                <li>Provider: {{ service.username }}</li>
+                <li>Service Type: {{ booking.service_type|title }}</li>
+                <li>Date: {{ booking.booking_date.strftime('%B %d, %Y') }}</li>
+            </ul>
+            
+            <center>
+                <a href="{{ review_link }}" class="button">Write Your Review</a>
+            </center>
+        </div>
+        
+        <div class="footer">
+            <p>This email was sent by Wedding Services. If you have any questions, please contact us.</p>
+        </div>
+    </div>
+</body>
+</html> 

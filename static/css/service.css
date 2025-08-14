@@ -77,8 +77,6 @@
   font-family: 'Courier New', Courier, monospace;
 }
 
-
-
 @media (max-width: 768px) {
   .img-size {
     width: 90vw;
@@ -86,8 +84,6 @@
     max-height: 300px;
   }
 }
-
-
 
 /* Main content */
 main {
@@ -197,6 +193,51 @@ h1 {
   color: #555;
   font-size: 14px;
   margin-bottom: 15px;
+}
+
+.navbar .form-select {
+  background-color: white;
+  border: 1px solid #ced4da;
+  transition: all 0.3s ease;
+}
+
+.navbar .form-select:focus {
+  border-color: #EFA6C0;
+  box-shadow: 0 0 0 0.2rem rgba(239, 166, 192, 0.25);
+}
+
+.navbar .btn-outline-secondary {
+  border-color: #ced4da;
+  color: #6c757d;
+  background-color: white;
+}
+
+.navbar .btn-outline-secondary:hover {
+  background-color: #EFA6C0;
+  border-color: #EFA6C0;
+  color: white;
+}
+
+/* Responsive adjustments for navbar filters */
+@media (max-width: 992px) {
+  .navbar form {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .navbar .form-select,
+  .navbar .btn {
+    width: 100%;
+    max-width: none !important;
+    margin: 0.25rem 0;
+  }
+}
+
+/* Remove the old filter section styles since we're not using them anymore */
+.filter-section {
+  display: none;
 }
 
 

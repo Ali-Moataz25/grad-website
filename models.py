@@ -32,7 +32,7 @@ class Venue(db.Model):
     phone_number = db.Column(db.String(20))
     description = db.Column(db.Text)
     location = db.Column(db.String(200))
-    price = db.Column(db.Float)
+    price = db.Column(db.String(20))
     media = db.Column(db.String(200))
     approval_status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
     
@@ -51,7 +51,7 @@ class Hairdresser(db.Model):
     phone_number = db.Column(db.String(20))
     description = db.Column(db.Text)
     location = db.Column(db.String(200))
-    price = db.Column(db.Float)
+    price = db.Column(db.String(20))
     media = db.Column(db.String(200))
     approval_status = db.Column(db.String(20), default='pending')
     
@@ -70,7 +70,7 @@ class Weddingplanner(db.Model):
     phone_number = db.Column(db.String(20))
     description = db.Column(db.Text)
     location = db.Column(db.String(200))
-    price = db.Column(db.Float)
+    price = db.Column(db.String(20))
     media = db.Column(db.String(200))
     approval_status = db.Column(db.String(20), default='pending')
     
@@ -89,16 +89,16 @@ class Makeupartist(db.Model):
     phone_number = db.Column(db.String(20))
     description = db.Column(db.Text)
     location = db.Column(db.String(200))
-    price = db.Column(db.Float)
+    price = db.Column(db.String(20))
     media = db.Column(db.String(200))
     approval_status = db.Column(db.String(20), default='pending')
     
     # Relationship to bookings
     bookings = db.relationship('Booking',
-                             primaryjoin="and_(foreign(Makeupartist.id)==remote(Booking.service_id), "
-                                       "Booking.service_type=='makeupartist')",
-                             backref=db.backref('makeupartist_service', uselist=False),
-                             lazy=True)
+    primaryjoin="and_(foreign(Makeupartist.id)==remote(Booking.service_id), "
+    "Booking.service_type=='makeupartist')",
+    backref=db.backref('makeupartist_service', uselist=False),
+    lazy=True)
 
 class Venuedetails(db.Model):
     name = db.Column(db.String(180), primary_key=True, unique=True, nullable=False)
@@ -106,7 +106,7 @@ class Venuedetails(db.Model):
     phone_number = db.Column(db.String(20))
     description = db.Column(db.Text)
     location = db.Column(db.String(200))
-    price = db.Column(db.Float)
+    price = db.Column(db.String(20))
     media = db.Column(db.String(200))
 
 class Booking(db.Model):
@@ -153,7 +153,30 @@ class ProviderUpdate(db.Model):
     phone_number = db.Column(db.String(20))
     description = db.Column(db.Text)
     location = db.Column(db.String(200))
-    price = db.Column(db.Float)
+    price = db.Column(db.String(20))
     media = db.Column(db.String(200))
     
     status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
+
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    booking_id = db.Column(db.Integer, db.ForeignKey('booking.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    service_type = db.Column(db.String(50), nullable=False)
+    service_id = db.Column(db.Integer, nullable=False)
+    rating = db.Column(db.Integer, nullable=False)  # 1-5 stars
+    review_text = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    booking = db.relationship('Booking', backref=db.backref('review', uselist=False))
+    user = db.relationship('User', backref=db.backref('reviews', lazy=True))
+
+    def __repr__(self):
+        return f'<Review {self.id} by {self.user.username}>'
+
+class ServiceImage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    service_type = db.Column(db.String(20), nullable=False)  
+    service_id = db.Column(db.Integer, nullable=False)
+    filename = db.Column(db.String(200), nullable=False)

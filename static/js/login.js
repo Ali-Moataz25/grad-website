@@ -10,6 +10,7 @@ function login_user(event){
         headers: {
             'Content-Type': 'application/json'
         },
+        
         body: JSON.stringify({
             username: username,
             password: password,

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f39c12;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .content {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .booking-details {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Booking Request Received</h1>
+    </div>
+    
+    <div class="content">
+        <p>Dear {{ user.username }},</p>
+        
+        <p>Your booking request has been submitted and is pending approval from the service provider. Here are the details:</p>
+        
+        <div class="booking-details">
+            <h3>Booking Information:</h3>
+            <p><strong>Booking ID:</strong> {{ booking.id }}</p>
+            <p><strong>Service Type:</strong> {{ booking.service_type|title }}</p>
+            <p><strong>Service Provider:</strong> {{ service.username }}</p>
+            <p><strong>Date:</strong> {{ booking.booking_date.strftime('%B %d, %Y') }}</p>
+            <p><strong>Status:</strong> <span class="status">Pending Approval</span></p>
+            
+            <h4>Service Provider Details:</h4>
+            <ul>
+                <li>Name: {{ service.username }}</li>
+                <li>Location: {{ service.location }}</li>
+                <li>Price: {{ service.price }} EGP</li>
+            </ul>
+        </div>
+        
+        <p>What happens next?</p>
+        <ul>
+            <li>The service provider will review your booking request</li>
+            <li>You will receive another email when they approve or decline your booking</li>
+            <li>You can also check your booking status anytime in the "My Bookings" section of your account</li>
+        </ul>
+        
+        <p>Please note that your booking is not confirmed until you receive an approval email from the service provider.</p>
+    </div>
+    
+    <div class="footer">
+        <p>Thank you for using our Wedding Services platform!</p>
+        <p>If you have any questions, please don't hesitate to contact us.</p>
+    </div>
+</body>
+</html> 
